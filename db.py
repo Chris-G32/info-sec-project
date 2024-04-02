@@ -96,10 +96,11 @@ class PasswordDB:
         conn = sl.connect('gruskaDB.db')
         cursor = conn.cursor()
 
-        verify_query = '''SELECT 1 FROM users 
-        WHERE username = 'MASTER' 
-        AND password = (?);'''
-        cursor.execute(verify_query,master_key)
+        cursor.execute("SELECT * FROM users WHERE username = %(master)s", ('MASTER', ))
+        # verify_query = 
+        # cursor.execute("SELECT 1 FROM users \
+        # WHERE username = 'MASTER' \
+        # AND password = %s'",(master_key,))
 
         # Fetch all rows and return them
         credentials = cursor.fetchall()
@@ -107,3 +108,5 @@ class PasswordDB:
         # Close the connection
         conn.close()
         return len(credentials)>0
+
+print(PasswordDB.verify_master("MASTER_PASS"))

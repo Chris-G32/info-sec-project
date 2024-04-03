@@ -1,3 +1,5 @@
+import secrets
+
 class PasswordInfo:
     def __init__(self,user,password,site):
         self.user=user
@@ -28,3 +30,5 @@ def evaluateStrength(inp:str):
         score+=2
     return score
 
+def generate_password():
+    pass

@@ -51,7 +51,7 @@ class PasswordDB:
         conn.close()
     # Function to insert new credentials into the table
 
-    def insert_credentials(username:str, password:str, website:str):
+    def insert_credentials(website:str,username:str, password:str):
         # Connect to the SQLite database
         conn = sl.connect('gruskaDB.db')
         cursor = conn.cursor()
@@ -76,21 +76,21 @@ class PasswordDB:
         cursor = conn.cursor()
         if isMaster:
             query = """
-        SELECT username, password FROM logins 
+        SELECT website,username FROM logins 
         WHERE EXISTS (
             SELECT 1 FROM users 
             WHERE username = ? 
             AND password = ? 
         ); """
-            cursor.execute(query,('MASTER',password))
+            cursor.execute(query,('MASTER',password,))
         else:
             # SQL query to select all rows from the table
             query = '''
-            SELECT * FROM logins;
+            SELECT website,username,password FROM logins;
             '''
 
-        # Execute the SQL query
-        cursor.execute(query)
+            # Execute the SQL query
+            cursor.execute(query)
 
         # Fetch all rows and return them
         credentials = cursor.fetchall()
@@ -122,3 +122,4 @@ class PasswordDB:
         return len(credentials)>0
 
 # print(PasswordDB.verify_master("MASTER_PASS"))
+print(PasswordDB.retrieve_credentials('MASTER_PASS',True))

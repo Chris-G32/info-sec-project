@@ -51,37 +51,46 @@ class PasswordDB:
         conn.close()
     # Function to insert new credentials into the table
 
-    def insert_credentials(username, password, website):
+    def insert_credentials(username:str, password:str, website:str):
         # Connect to the SQLite database
         conn = sl.connect('gruskaDB.db')
         cursor = conn.cursor()
 
         # SQL query to insert new credentials
         insert_query = '''
-        INSERT INTO user_credentials (username, password, website)
+        INSERT INTO logins (username, password, website)
         VALUES (?, ?, ?);
         '''
 
         # Execute the SQL query with the provided values
-        cursor.execute(insert_query, (username, password, website))
+        cursor.execute(insert_query, (username, password, website,))
 
         # Commit changes and close the connection
         conn.commit()
         conn.close()
 
     # Function to retrieve all credentials from the table
-    def retrieve_credentials():
+    def retrieve_credentials(password,isMaster):
         # Connect to the SQLite database
         conn = sl.connect('gruskaDB.db')
         cursor = conn.cursor()
-
-        # SQL query to select all rows from the table
-        select_query = '''
-        SELECT * FROM user_credentials;
-        '''
+        if isMaster:
+            query = """
+        SELECT username, password FROM logins 
+        WHERE EXISTS (
+            SELECT 1 FROM users 
+            WHERE username = ? 
+            AND password = ? 
+        ); """
+            cursor.execute(query,('MASTER',password))
+        else:
+            # SQL query to select all rows from the table
+            query = '''
+            SELECT * FROM logins;
+            '''
 
         # Execute the SQL query
-        cursor.execute(select_query)
+        cursor.execute(query)
 
         # Fetch all rows and return them
         credentials = cursor.fetchall()
@@ -96,7 +105,10 @@ class PasswordDB:
         conn = sl.connect('gruskaDB.db')
         cursor = conn.cursor()
 
-        cursor.execute("SELECT * FROM users WHERE username = %(master)s", ('MASTER', ))
+        
+        query="SELECT * FROM users WHERE username = 'MASTER' AND password= ?"
+
+        cursor.execute(query, (master_key, ))
         # verify_query = 
         # cursor.execute("SELECT 1 FROM users \
         # WHERE username = 'MASTER' \
@@ -109,4 +121,4 @@ class PasswordDB:
         conn.close()
         return len(credentials)>0
 
-print(PasswordDB.verify_master("MASTER_PASS"))
+# print(PasswordDB.verify_master("MASTER_PASS"))

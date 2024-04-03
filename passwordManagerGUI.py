@@ -51,6 +51,7 @@ while True:
     elif event=='-REQ-UNLOCK-':
         if(values['-MASTER-FLAG-']):
            sg.popup(str(PasswordDB.verify_master(values['-USER-PASS-'])))
+           credentials=PasswordDB.retrieve_credentials(values['-USER-PASS-'],True)
         if matchesPassword(values['-USER-PASS-']):
             
             unlockGUI()
@@ -72,7 +73,7 @@ while True:
             window['-STRENGTH-'].update(value="Weak")
     elif event=="-ADD-PASS-":
         if pw.evaluateStrength(values['-PASS-INP-'])>WEAK:
-            pass
+            PasswordDB.insert_credentials(values['-USER-INP-'],values['-PASS-INP-'],values['-SITE-INP-'])
         else:
             sg.popup("Password is not strong enough!")
         # print('Hello', values[0], '!')

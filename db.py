@@ -1,5 +1,5 @@
 import sqlite3 as sl
-
+import passwords as pw
 
 class PasswordDB:
     # Function to create the database and table
@@ -24,7 +24,7 @@ class PasswordDB:
 
         create_table_query = '''CREATE TABLE IF NOT EXISTS users (
             username TEXT PRIMARY KEY,
-            password TEXT
+            password BINARY(128)
         );'''
         cursor.execute(create_table_query)
 
@@ -41,15 +41,48 @@ class PasswordDB:
         INSERT INTO users (username, password)
         VALUES (?, ?);
         '''
+        password=pw.generate_key('admin')
         try:
         # Execute the SQL query with the provided values
-            cursor.execute(insert_query, ('MASTER', 'MASTER_PASS'))
+            cursor.execute(insert_query, ('MASTER', password))
         except:
             pass
         # Commit changes and close the connection
         conn.commit()
         conn.close()
+        #DEBUG PRINT
+        print()
+    def create_local(password:str):
+        conn = sl.connect('gruskaDB.db')
+        cursor = conn.cursor()
+
+        # SQL query to insert new credentials
+        insert_query = '''
+        INSERT INTO users (username, password)
+        VALUES (?, ?);
+        '''
+        
+        # Execute the SQL query with the provided values
+        cursor.execute(insert_query, ('LOCAL', pw.generate_key(password)))
+
+        # Commit changes and close the connection
+        conn.commit()
+        conn.close()
     # Function to insert new credentials into the table
+    def local_exists():
+        conn = sl.connect('gruskaDB.db')
+        cursor = conn.cursor()
+        
+        query="SELECT 1 FROM users WHERE username = 'LOCAL'"
+
+        cursor.execute(query)
+
+        # Fetch all rows and return them
+        res = cursor.fetchall()
+
+        # Close the connection
+        conn.close()
+        return len(res)>0
 
     def insert_credentials(website:str,username:str, password:str):
         # Connect to the SQLite database
@@ -85,12 +118,16 @@ class PasswordDB:
             cursor.execute(query,('MASTER',password,))
         else:
             # SQL query to select all rows from the table
-            query = '''
-            SELECT website,username,password FROM logins;
-            '''
+            query = """
+        SELECT website,username,password FROM logins 
+        WHERE EXISTS (
+            SELECT 1 FROM users 
+            WHERE username = ?
+            AND password = ? 
+        ); """
 
             # Execute the SQL query
-            cursor.execute(query)
+            cursor.execute(query,('LOCAL',password,))
 
         # Fetch all rows and return them
         credentials = cursor.fetchall()
@@ -101,14 +138,13 @@ class PasswordDB:
         return credentials
 
 
-    def verify_master(master_key):
+    def verify_user(user,master_key):
         conn = sl.connect('gruskaDB.db')
         cursor = conn.cursor()
-
         
-        query="SELECT * FROM users WHERE username = 'MASTER' AND password= ?"
+        query="SELECT * FROM users WHERE username = ? AND password= ?"
 
-        cursor.execute(query, (master_key, ))
+        cursor.execute(query, (user,master_key, ))
         # verify_query = 
         # cursor.execute("SELECT 1 FROM users \
         # WHERE username = 'MASTER' \
@@ -122,4 +158,3 @@ class PasswordDB:
         return len(credentials)>0
 
 # print(PasswordDB.verify_master("MASTER_PASS"))
-print(PasswordDB.retrieve_credentials('MASTER_PASS',True))

@@ -102,7 +102,8 @@ class KeyChainView(View):
                          key='-PASS-INP-', enable_events=True), sg.Text("Weak", key="-STRENGTH-")],
                      [sg.Button("Generate Password", key="-GEN-"),sg.Button("Add Password", key="-ADD-PASS-")]]
         return [[sg.Column(headers, key='-BODY-')],
-          [sg.Column(site_adder_layout, visible=False, key='-CREATE-CREDS-')]]
+          [sg.Column(site_adder_layout, visible=False, key='-CREATE-CREDS-')],
+          [sg.Button("Logout",key='-LOGOUT-')]]
     def run_event_loop(self):
         self.window.finalize()
         for i in CredentialQueries.retrieve_credentials(self.user,self.pw):
@@ -116,6 +117,8 @@ class KeyChainView(View):
             # if user closes window or clicks cancel
             if event == sg.WIN_CLOSED or event == 'Cancel':
                 break
+            elif event=='-LOGOUT-':
+                return 'LOGOUT'
             elif event == "-PASS-INP-":
                 self.on_password_update(values)
             elif event == "-ADD-PASS-":

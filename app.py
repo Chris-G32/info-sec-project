@@ -12,9 +12,12 @@ class App:
         if not UserQueries.user_exists("LOCAL"):
             InitialSigninView().display()
         user,pw=LoginView().display()
-
-        #Normal app view
-        KeyChainView(user,pw).display()
+        while(pw!=None):
+            #Normal app view
+            if KeyChainView(user,pw).display()=='LOGOUT':
+                user,pw=LoginView().display()
+            else:
+                break
         
         
 app=App()

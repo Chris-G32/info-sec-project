@@ -1,6 +1,7 @@
 from db import PasswordDB,UserQueries
 from view import InitialSigninView,LoginView,KeyChainView
 
+#Class modeling simple app window flow
 class App:
     #Start up apps backend
     def __init__(self):
@@ -18,8 +19,3 @@ class App:
                 user,pw=LoginView().display()
             else:
                 break
-        
-        
-app=App()
-app.start()
-#myPass123!

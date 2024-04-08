@@ -86,6 +86,8 @@ class LoginView(View):
                     authenticated_password=password
                     authenticated_user=user
                     self.window.close()
+                else:
+                    sg.popup(f"Incorrect signin info for: {user}!")
 class KeyChainView(View):
     def __init__(self,user,pw):
         super()

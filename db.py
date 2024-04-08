@@ -126,7 +126,7 @@ class CredentialQueries:
         
         #Decrypt passwords
         for cred in credentials:
-            plaintext_pass='N'
+            plaintext_pass='N/A'
             if(user!='MASTER'):
                 plaintext_pass=PasswordUtils.decrypt(password,cred[2],cred[3])
             decrypted_credentials.append([cred[0],cred[1],plaintext_pass])

@@ -123,13 +123,13 @@ class CredentialQueries:
         # Fetch all rows and return them
         credentials = cursor.fetchall()
         decrypted_credentials=[]
-        if( user!='MASTER'):
-            #Decrypt passwords
-            for cred in credentials:
-                print("encrypted")
-                print(cred[2])
+        
+        #Decrypt passwords
+        for cred in credentials:
+            plaintext_pass='N'
+            if(user!='MASTER'):
                 plaintext_pass=PasswordUtils.decrypt(password,cred[2],cred[3])
-                decrypted_credentials.append([cred[0],cred[1],plaintext_pass])
+            decrypted_credentials.append([cred[0],cred[1],plaintext_pass])
                 
             
         # Close the connection

@@ -55,10 +55,6 @@ class UserQueries:
         query="SELECT * FROM users WHERE username = ? AND password= ?"
 
         cursor.execute(query, (user,PasswordUtils.hash_password(password), ))
-        # verify_query = 
-        # cursor.execute("SELECT 1 FROM users \
-        # WHERE username = 'MASTER' \
-        # AND password = %s'",(master_key,))
 
         # Fetch all rows and return them
         credentials = cursor.fetchall()

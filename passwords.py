@@ -41,6 +41,13 @@ class PasswordUtils:
     def hash_password(pw:str):
         return hashlib.sha256(bytes(pw,'utf-8'),usedforsecurity=True).digest()
     
+    def keygen(pw:str):
+        kdf = pbkdf2.PBKDF2HMAC(
+        algorithm=SHA256(),
+        length=32,salt=b'\x13\xaf',iterations=10000
+        )
+        return kdf.derive(bytes(pw,'utf-8'))
+    
     def encrypt(pw:str,plaintext:str):
         key=PasswordUtils.keygen(pw)
         cipher = AES.new(key, AES.MODE_CFB)
@@ -52,12 +59,7 @@ class PasswordUtils:
         decrypt_cipher = AES.new(key, AES.MODE_CFB,iv=iv)
         plaintext = decrypt_cipher.decrypt(cipher_text).decode("utf-8")
         return plaintext
-    def keygen(pw:str):
-        kdf = pbkdf2.PBKDF2HMAC(
-        algorithm=SHA256(),
-        length=32,salt=b'\x13\xaf',iterations=10000
-        )
-        return kdf.derive(bytes(pw,'utf-8'))
+    
     def generate_password():
         numgen=secrets.SystemRandom()
         PASS_LENGTH=16
